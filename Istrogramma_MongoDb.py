@@ -1,3 +1,4 @@
+import csv
 from pymongo import MongoClient
 import timeit
 import statistics
@@ -18,10 +19,10 @@ mongo_collection_100 = mongo_db['Db_100']
 
 # Definizione dei dataset
 mongo_collections = {
-    '25': mongo_collection_25,
-    '50': mongo_collection_50,
-    '75': mongo_collection_75,
-    '100': mongo_collection_100
+    '25%': mongo_collection_25,
+    '50%': mongo_collection_50,
+    '75%': mongo_collection_75,
+    '100%': mongo_collection_100
 }
 
 # Numero di esecuzioni per ogni query e dataset
@@ -30,30 +31,32 @@ num_executions = 31
 # Foglio elettronico per i risultati
 workbook = openpyxl.Workbook()
 sheet = workbook.active
-sheet.append(['Query', 'Percentuale Dati', 'Esecuzione', 'Tempo (ms)'])
+sheet.append(['Query', 'Percentuale Dati', 'Esecuzione', 'Tempo (ms)', 'Intervallo Inf (ms)', 'Intervallo Sup (ms)'])
 
+# Funzione per eseguire la query e misurare il tempo utilizzando timeit
 # Funzione per eseguire la query e misurare il tempo utilizzando timeit
 def execute_query(collection, query):
     def wrapper():
-        result = collection.find(query)
+        result = list(collection.find(query))  # Converti il risultato in una lista
     return wrapper
 
-# Esegui gli esperimenti e registra i risultati nel foglio elettronico
-for query_name, query_list in queries.queries.items():
+with open('Risultati_esperimenti.csv', 'w', newline='') as csvfile:
+    csvwriter = csv.writer(csvfile)
+    csvwriter.writerow(['Query', 'Percentuale Dati', 'Esecuzione', 'Tempo (ms)', 'Intervallo Inf (ms)', 'Intervallo Sup (ms)'])
+
+    # Esegui gli esperimenti e registra i risultati nel file CSV
     for query_name, query_list in queries.queries.items():
         first_execution_times = []  # Lista per i tempi della prima esecuzione
-        dataset_percentages = list(mongo_collections.keys())  # Lista delle percentuali di dataset
         query_avg_times = []  # Lista per i tempi medi delle esecuzioni successive (reset per ogni query)
-        confidence_intervals = []
+        confidence_intervals = []  # Lista per gli intervalli di confidenza
         for dataset_percentage, collection in mongo_collections.items():
-            print(f"Query: {query_name}, Dataset: {dataset_percentage}%")
+            print(f"Query: {query_name}, Dataset: {dataset_percentage}")
             single_query_times = []
             for _ in range(num_executions):
-                start_time = timeit.timeit(execute_query(collection, query_list[0]), number=1)
+                query_func = execute_query(collection, query_list[0])
+                start_time = timeit.timeit(query_func, number=1)
                 elapsed_time = start_time * 1000  # Tempo in millisecondi
                 single_query_times.append(elapsed_time)
-                sheet.append([query_name, dataset_percentage, _ + 1, elapsed_time])
-
                 if _ == 0:
                     first_execution_times.append(elapsed_time)  # Aggiungi il tempo della prima esecuzione
 
@@ -64,12 +67,19 @@ for query_name, query_list in queries.queries.items():
             confidence_intervals.append((confidence_interval[1] - confidence_interval[
                 0]) / 2)  # L'intervallo completo è troppo grande per visualizzarlo in barre dell'errore
 
+            # Aggiungi i tempi delle prime esecuzioni al file CSV
+            csvwriter.writerow([query_name, dataset_percentage, 'First Execution Time', '', '', first_execution_times[0]])
+
+            # Aggiungi i tempi medi e gli intervalli di confidenza al file CSV
+            csvwriter.writerow([query_name, dataset_percentage, 'Avg Time', '', '', avg_time])
+            csvwriter.writerow([query_name, dataset_percentage, 'Confidence Interval', '', confidence_interval[0], confidence_interval[1]])
+
             print(f"  Tempo medio: {avg_time:.2f} ms")
             print(f"  Intervallo di confidenza: ({confidence_interval[0]:.2f}, {confidence_interval[1]:.2f})")
 
         # Crea un istogramma per il tempo della prima esecuzione
         plt.figure()
-        plt.bar(dataset_percentages, first_execution_times, color='blue', alpha=0.7)
+        plt.bar([str(p) for p in mongo_collections.keys()], first_execution_times, color='blue', alpha=0.7)
         plt.xlabel('Percentuale Dataset')
         plt.ylabel('Tempo (ms)')
         plt.title(f'Istogramma Prima Esecuzione - Query {query_name}')
@@ -81,7 +91,7 @@ for query_name, query_list in queries.queries.items():
 
         # Crea un istogramma per il tempo medio delle successive 30 esecuzioni
         plt.figure()
-        plt.bar(dataset_percentages, query_avg_times, color='blue', alpha=0.7, yerr=confidence_intervals, capsize=5)
+        plt.bar([str(p) for p in mongo_collections.keys()], query_avg_times, color='blue', alpha=0.7, yerr=confidence_intervals, capsize=5)
         plt.xlabel('Percentuale Dataset')
         plt.ylabel('Tempo Medio (ms)')
         plt.title(f'Istogramma Tempo Medio 30 Esecuzioni - Query {query_name}')
@@ -91,8 +101,8 @@ for query_name, query_list in queries.queries.items():
         plt.savefig(f'hist_avg_30_executions_{query_name}.png')
         plt.close()
 
-# Salva il foglio elettronico
-workbook.save('risultati_esperimenti.xlsx')
+# Chiudi il file CSV
+csvfile.close()
 
 # Chiudi la connessione
 mongo_client.close()
