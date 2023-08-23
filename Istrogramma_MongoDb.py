@@ -46,11 +46,11 @@ with open('Risultati_esperimenti.csv', 'w', newline='') as csvfile:
 
     # Esegui gli esperimenti e registra i risultati nel file CSV
     for query_name, query_list in queries.queries.items():
-        first_execution_times = []  # Lista per i tempi della prima esecuzione
-        query_avg_times = []  # Lista per i tempi medi delle esecuzioni successive (reset per ogni query)
-        confidence_intervals = []  # Lista per gli intervalli di confidenza
         for dataset_percentage, collection in mongo_collections.items():
             print(f"Query: {query_name}, Dataset: {dataset_percentage}")
+            first_execution_times = []  # Lista per i tempi della prima esecuzione
+            query_avg_times = []  # Lista per i tempi medi delle esecuzioni successive (reset per ogni query)
+            confidence_intervals = []  # Lista per gli intervalli di confidenza
             single_query_times = []
             for _ in range(num_executions):
                 query_func = execute_query(collection, query_list[0])
@@ -68,11 +68,13 @@ with open('Risultati_esperimenti.csv', 'w', newline='') as csvfile:
                 0]) / 2)  # L'intervallo completo è troppo grande per visualizzarlo in barre dell'errore
 
             # Aggiungi i tempi delle prime esecuzioni al file CSV
-            csvwriter.writerow([query_name, dataset_percentage, 'First Execution Time', '', '', first_execution_times[0]])
+            csvwriter.writerow(
+                [query_name, dataset_percentage, 'First Execution Time', '', '', first_execution_times[0]])
 
             # Aggiungi i tempi medi e gli intervalli di confidenza al file CSV
             csvwriter.writerow([query_name, dataset_percentage, 'Avg Time', '', '', avg_time])
-            csvwriter.writerow([query_name, dataset_percentage, 'Confidence Interval', '', confidence_interval[0], confidence_interval[1]])
+            csvwriter.writerow([query_name, dataset_percentage, 'Confidence Interval', '', confidence_interval[0],
+                                confidence_interval[1]])
 
             print(f"  Tempo medio: {avg_time:.2f} ms")
             print(f"  Intervallo di confidenza: ({confidence_interval[0]:.2f}, {confidence_interval[1]:.2f})")
