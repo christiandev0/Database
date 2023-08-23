@@ -7,7 +7,7 @@ import openpyxl
 import scipy.stats
 import queries  # Importa le query definite nel file queries.py
 
-#Connessione a MongoDB
+# Connessione a MongoDB
 mongo_client = MongoClient('mongodb://localhost:27017/')
 mongo_db = mongo_client['Antiriciclaggio']  # Cambia il nome del database se necessario
 

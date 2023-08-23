@@ -98,7 +98,7 @@ queries = {
                 'totalAmount': {'$sum': '$Importo'}
             }
         },
-        #Ordina per giorno della settimana crescente
+        # Ordina per giorno della settimana crescente
         {'$sort': {'_id': 1}}
     ]
 }
