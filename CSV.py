@@ -21,4 +21,4 @@ with open(csv_file_path, 'w', newline='') as csv_file:
     csv_writer.writeheader()
     csv_writer.writerows(transactions_data)
 
-print("File CSV creato con successo:", csv_file_path)
+print("File CSV creato con successo: ", csv_file_path)

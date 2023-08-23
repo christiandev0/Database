@@ -26,7 +26,7 @@ datasets = {
     'Db_100': transactions_data
 }
 
-# Inserimento dei dati nei diversi dataset
+#Inserimento dei dati nei diversi dataset
 for collection_name, dataset in datasets.items():
     collection = mongo_db[collection_name]
     collection.insert_many(dataset)

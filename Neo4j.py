@@ -53,7 +53,7 @@ with driver100.session() as session:
     insert_data_to_neo4j(db100, session)
     print("Inserimento nel dataset 100% completato")
 
-# Chiudi la connessione al database Neo4j
+#Chiudi la connessione al database Neo4j
 driver25.close()
 driver50.close()
 driver75.close()
