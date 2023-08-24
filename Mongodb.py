@@ -15,7 +15,9 @@ with open('transactions.csv', 'r', newline='') as csv_file:
             'Mittente': row['Mittente'],
             'Destinatario': row['Destinatario'],
             'Importo': int(row['Importo']),
-            'Data': row['Data']
+            'Data': row['Data'],
+            'Metodo_di_pagamento': row['Metodo_di_pagamento'],
+            'Valuta': row['Valuta']
         })
 
 # Inserimento dei dati in MongoDB

@@ -41,7 +41,7 @@ def execute_query(collection, query):
     return wrapper
 
 
-with open('Risultati_esperimenti.csv', 'w', newline='') as csvfile:
+with open('Risultati_esperimenti_MongoDB.csv', 'w', newline='') as csvfile:
     csvwriter = csv.writer(csvfile)
     csvwriter.writerow(
         ['Query', 'Percentuale Dati', 'Esecuzione', 'Tempo (ms)', 'Intervallo Inf (ms)', 'Intervallo Sup (ms)'])

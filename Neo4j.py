@@ -20,12 +20,9 @@ with open('transactions.csv', 'r', newline='') as csv_file:
 
 # Funzione per inserire i dati da un dataset nel database Neo4j
 def insert_data_to_neo4j(dataset, session):
-    query = """
-    UNWIND $rows as row
-    MERGE (mitt:Mittente {nome: row.Mittente})
-    MERGE (dest:Destinatario {nome: row.Destinatario})
-    CREATE (mitt)-[:TRANS{importo: row.Importo, data: row.Data}]->(dest)
-    """
+    query = """UNWIND $rows as row MERGE (mitt:Mittente {nome: row.Mittente}) MERGE (dest:Destinatario {nome: 
+    row.Destinatario}) CREATE (mitt)-[:TRANS{importo: toInteger(row.Importo), data: row.Data, 
+    metodo: row.Metodo_di_pagamento, valuta: row.Valuta}]->(dest)"""
     session.run(query, rows=dataset)
 
 

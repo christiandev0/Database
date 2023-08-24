@@ -76,13 +76,24 @@ for query_idx, query in enumerate(queries):
 # Scrivi i risultati nel file CSV
 csv_file = 'Risultati_esperimenti_Neo4j.csv'
 with open(csv_file, 'w', newline='', encoding='utf-8') as csvfile:
-    fieldnames = ['Query', 'Database', 'First Execution Time (ms)', 'Average Execution Time (ms)',
-                  'Confidence Interval (95%)']
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    writer.writeheader()
+    csvwriter = csv.writer(csvfile)
 
+    # Scrivi l'intestazione
+    csvwriter.writerow(
+        ['Query', 'Percentuale Dati', 'Esecuzione', 'Tempo (ms)', 'Intervallo Inf (ms)', 'Intervallo Sup (ms)'])
+
+    # Scrivi i risultati
     for data in execution_times:
-        writer.writerow(data)
+        query_name = data["Query"]
+        percentage = data["Database"]
+        first_execution_time = data["First Execution Time (ms)"]
+        avg_execution_time = data["Average Execution Time (ms)"]
+        confidence_interval = data["Confidence Interval (95%)"]
+
+        # Scrivi le righe nel formato desiderato
+        csvwriter.writerow([query_name, percentage, 'First Execution Time', '', '', first_execution_time])
+        csvwriter.writerow([query_name, percentage, 'Avg Time', '', '', avg_execution_time])
+        csvwriter.writerow([query_name, percentage, 'Confidence Interval', '', confidence_interval[0], confidence_interval[1]])
 
 # Chiudi la connessione al database Neo4j
 driver.close()
