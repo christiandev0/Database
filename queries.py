@@ -1,7 +1,5 @@
-# queries.py
-
 queries = {
-    '25': [
+    'Query 1': [
         {'Importo': {'$gt': 1000}},
         {
             '$and': [
@@ -33,7 +31,7 @@ queries = {
             ]
         }
     ],
-    '50': [{'Importo': {'$gt': 1000}},
+    'Query 2': [{'Importo': {'$gt': 1000}},
            {
                '$and': [
                    {'Mittente': 'MittenteSospetto'},
@@ -63,7 +61,7 @@ queries = {
                    }
                ]
            }],
-    '75': [{'Importo': {'$gt': 1000}},
+    'Query 3': [{'Importo': {'$gt': 1000}},
            {
                '$and': [
                    {'Mittente': 'MittenteSospetto'},
@@ -93,7 +91,7 @@ queries = {
                    }
                ]
            }],
-    '100': [{'Importo': {'$gt': 1000}},
+    'Query 4': [{'Importo': {'$gt': 1000}},
             {
                 '$and': [
                     {'Mittente': 'MittenteSospetto'},
