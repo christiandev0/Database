@@ -10,7 +10,7 @@ queries = ['Query 1', 'Query 2', 'Query 3', 'Query 4']
 
 bar_width = 0.4  # Larghezza delle barre
 bar_positions = np.arange(len(dataset_sizes))
-
+# Creazione degli istogrammi
 for query in queries:
     plt.figure(figsize=(12, 6))
 

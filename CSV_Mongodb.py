@@ -26,7 +26,6 @@ collections = {
 
 
 # Funzione per eseguire la query e misurare il tempo utilizzando timeit
-# Funzione per eseguire la query e misurare il tempo utilizzando timeit
 def execute_query(collection, query):
     def wrapper():
         result = list(collection.find(query))  # Converti il risultato in una lista

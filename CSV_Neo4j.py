@@ -16,7 +16,7 @@ queries = [
 
     """,
     """
-    MATCH (n:Transazione)
+MATCH (n:Transazione)
 WHERE n.Importo > 1000
 OR (n.Mittente = 'MittenteSospetto' AND n.Destinatario = 'DestinatarioSospetto')
 OR (n.Importo > 500 OR n.Mittente = 'MittenteSospetto' OR n.Destinatario = 'DestinatarioSospetto')
