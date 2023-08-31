@@ -8,7 +8,7 @@ import queries  # Importa le query definite nel file queries.py
 
 # Connessione a MongoDB
 mongo_client = MongoClient('mongodb://localhost:27017/')
-mongo_db = mongo_client['Antiriciclaggio']  # Cambia il nome del database se necessario
+mongo_db = mongo_client['Antiriciclaggio']
 
 # Definizione delle collezioni
 mongo_collection_25 = mongo_db['Db_25']
@@ -25,11 +25,11 @@ collections = {
 }
 
 
-# Funzione per eseguire la query e misurare il tempo utilizzando timeit
+# Funzione per eseguire la query
 def execute_query(collection, query):
     def wrapper():
-        result = list(collection.find(query))  # Converti il risultato in una lista
-        return result  # Restituisci il risultato della query
+        result = list(collection.find(query))  # Converte il risultato in una lista
+        return result  # Restituisce il risultato della query
 
     return wrapper
 
@@ -43,7 +43,7 @@ with open('Risultati_esperimenti_MongoDB.csv', 'w', newline='') as csvfile:
     csvwriter.writerow(
         ['Query', 'Database', 'First Execution Time (ms)', 'Average Execution Time (ms)', 'Confidence Interval (95%)'])
 
-    # Esegui gli esperimenti e registra i risultati nel file CSV
+    # Esecuzione degli esperimenti e registrazione dei risultati nel file CSV
     for query_name, query_list in queries.queries.items():
         for dataset_percentage, collection in collections.items():
             print(f"Query: {query_name}, Dataset: {dataset_percentage}")
@@ -51,7 +51,7 @@ with open('Risultati_esperimenti_MongoDB.csv', 'w', newline='') as csvfile:
             for _ in range(num_executions):
                 query_func = execute_query(collection, query_list[0])
                 start_time = time.perf_counter()
-                query_func()  # Esegui effettivamente la query
+                query_func()  # Esecuzione effettiva della query
                 elapsed_time = (time.perf_counter() - start_time) * 1000  # Tempo in millisecondi
                 single_query_times.append(elapsed_time)
 
@@ -59,15 +59,15 @@ with open('Risultati_esperimenti_MongoDB.csv', 'w', newline='') as csvfile:
             confidence_interval = scipy.stats.t.interval(0.95, len(single_query_times) - 1, loc=avg_time,
                                                          scale=scipy.stats.sem(single_query_times))
 
-            # Scrivi i risultati nel file CSV
+            # Scrittura dei risultati nel file CSV
             csvwriter.writerow([query_name, dataset_percentage, single_query_times[0], avg_time,
                                 f'({confidence_interval[0]}, {confidence_interval[1]})'])
 
             print(f"  Tempo medio: {avg_time:.2f} ms")
             print(f"  Intervallo di confidenza: ({confidence_interval[0]:.2f}, {confidence_interval[1]:.2f})")
 
-# Chiudi il file CSV
+# Chiusura del file CSV
 csvfile.close()
 
-# Chiudi la connessione
+# Chiusura della connessione
 mongo_client.close()

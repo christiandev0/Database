@@ -21,13 +21,13 @@ def extract_confidence_values(confidence_interval_str):
     return float(matches[0]), float(matches[1])
 
 
-# Per ogni query, crea gli istogrammi
+# Per ogni query crea gli istogrammi
 for query in queries:
     # Filtra i dati per la query corrente
     data_mongo_query = data_mongo[data_mongo['Query'] == query]
     data_neo4j_query = data_neo4j[data_neo4j['Query'] == query]
 
-    # Crea il primo istogramma con i tempi della prima esecuzione
+    # Creazione del primo istogramma con i tempi della prima esecuzione
     plt.figure(figsize=(10, 6))
     for size in dataset_sizes:
         values_mongo = data_mongo_query[data_mongo_query['Database'] == size]['First Execution Time (ms)']
@@ -44,13 +44,13 @@ for query in queries:
     plt.tight_layout()
     plt.show()
 
-    # Crea il secondo istogramma con le medie dei tempi
+    # Creazione del secondo istogramma con le medie dei tempi e gli intervalli
     plt.figure(figsize=(10, 6))
     for size in dataset_sizes:
         values_mongo = data_mongo_query[data_mongo_query['Database'] == size]['Average Execution Time (ms)']
         values_neo4j = data_neo4j_query[data_neo4j_query['Database'] == size]['Average Execution Time (ms)']
 
-        # Estrai intervalli di confidenza
+        # Estrazione intervalli di confidenza
         confidence_intervals_mongo = data_mongo_query[data_mongo_query['Database'] == size][
             'Confidence Interval (95%)']
         confidence_intervals_neo4j = data_neo4j_query[data_neo4j_query['Database'] == size][
@@ -58,7 +58,7 @@ for query in queries:
         conf_intervals_mongo = [extract_confidence_values(conf_str) for conf_str in confidence_intervals_mongo]
         conf_intervals_neo4j = [extract_confidence_values(conf_str) for conf_str in confidence_intervals_neo4j]
 
-        # Estrai valori minimi e massimi dagli intervalli di confidenza
+        # Estrazione valori minimi e massimi dagli intervalli di confidenza
         conf_mongo_min = [conf[0] for conf in conf_intervals_mongo]
         conf_mongo_max = [conf[1] for conf in conf_intervals_mongo]
         conf_neo4j_min = [conf[0] for conf in conf_intervals_neo4j]

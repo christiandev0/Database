@@ -6,7 +6,7 @@ from scipy.stats import t
 import time
 from neo4j import GraphDatabase
 
-# Definisci le query
+# Definizione delle query
 queries = [
     """MATCH (n:Transazione)
        WHERE n.Importo > 1000 OR
@@ -38,7 +38,7 @@ queries = [
     """
 ]
 
-# Definisci le percentuali
+# Definizione delle percentuali
 percentages = ['25%', '50%', '75%', '100%']
 num_executions = 31
 # Connessione al database Neo4j
@@ -50,35 +50,27 @@ driver = GraphDatabase.driver(uri, auth=(username, password))
 # Lista per memorizzare i tempi di esecuzione
 execution_times = []
 
-# Esegui le query per diverse percentuali
+# Esecuzione delle query per diverse percentuali
 for query_idx, query in enumerate(queries):
     for percentage in percentages:
         print(f"Esecuzione Query {query_idx + 1}  {percentage}")
         execution_times_query = []
-
         ignore_first_execution = True  # Variabile per ignorare la prima esecuzione della prima query al 25%
-
         with driver.session() as session:
             for _ in range(num_executions):
                 start_time = time.perf_counter()
                 # Esegui la query e ottieni il risultato
                 result = session.run(query).data()
                 execution_time = (time.perf_counter() - start_time) * 1000
-
                 # Ignora la prima esecuzione della prima query al 25%
                 if query_idx == 0 and percentage == '25%' and ignore_first_execution:
                     ignore_first_execution = False
                     continue
-
                 execution_times_query.append(execution_time)
-
             avg_execution_time = statistics.mean(execution_times_query)  # Calcola la media
             first_execution_time = execution_times_query[0]
-            std_deviation = statistics.stdev(execution_times_query)  # Deviazione standard delle medie
-            confidence_interval = (
-                avg_execution_time - 1.96 * std_deviation,  # Calcolo dell'intervallo di confidenza inferiore
-                avg_execution_time + 1.96 * std_deviation  # Calcolo dell'intervallo di confidenza superiore
-            )
+            confidence_interval = scipy.stats.t.interval(0.95, len(execution_times_query) - 1, loc=avg_execution_time,
+                                                         scale=scipy.stats.sem(execution_times_query))
 
             print(f"Tempo di esecuzione medio (ms): {avg_execution_time}")
             print(f"Tempo della prima esecuzione (ms): {first_execution_time}")
@@ -92,7 +84,7 @@ for query_idx, query in enumerate(queries):
                 "Confidence Interval (95%)": confidence_interval,
             })
 
-# Scrivi i risultati nel file CSV
+# Scrittura dei risultati nel file CSV
 csv_file = 'Risultati_esperimenti_Neo4j.csv'
 with open(csv_file, 'w', newline='', encoding='utf-8') as csvfile:
     fieldnames = ['Query', 'Database', 'First Execution Time (ms)', 'Average Execution Time (ms)',
@@ -103,5 +95,5 @@ with open(csv_file, 'w', newline='', encoding='utf-8') as csvfile:
     for data in execution_times:
         writer.writerow(data)
 
-# Chiudi la connessione al database Neo4j
+# Chiusura della connessione al database Neo4j
 driver.close()
