@@ -20,7 +20,8 @@ with open('transactions.csv', 'r', newline='') as csv_file:
             'Valuta': row['Valuta'],
             'Paese_del_Cliente': row['Paese_del_Cliente'],
             'Paese_a_Rischio': row['Paese_a_Rischio'],
-            'Nome_sospetto': row['Nome_sospetto']
+            'Mittente_sospetto': row['Mittente_sospetto'],
+            'Destinatario_sospetto': row['Destinatario_sospetto']
         })
 
 # Inserimento dei dati in MongoDB

@@ -42,7 +42,6 @@ with open('Risultati_esperimenti_MongoDB.csv', 'w', newline='') as csvfile:
     csvwriter = csv.writer(csvfile)
     csvwriter.writerow(
         ['Query', 'Database', 'First Execution Time (ms)', 'Average Execution Time (ms)', 'Confidence Interval (95%)'])
-
     # Esecuzione degli esperimenti e registrazione dei risultati nel file CSV
     for query_name, query_list in queries.queries.items():
         for dataset_percentage, collection in collections.items():
@@ -58,7 +57,6 @@ with open('Risultati_esperimenti_MongoDB.csv', 'w', newline='') as csvfile:
             avg_time = statistics.mean(single_query_times)
             confidence_interval = scipy.stats.t.interval(0.95, len(single_query_times) - 1, loc=avg_time,
                                                          scale=scipy.stats.sem(single_query_times))
-
             # Scrittura dei risultati nel file CSV
             csvwriter.writerow([query_name, dataset_percentage, single_query_times[0], avg_time,
                                 f'({confidence_interval[0]}, {confidence_interval[1]})'])

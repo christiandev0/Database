@@ -1,9 +1,15 @@
-from ProgettoDB.CSV import nomsospetti
+import csv
+
+nomsospetti = []
+with open('nomsospetti.csv', 'r', newline='') as csvfile:
+    reader = csv.reader(csvfile)
+    for row in reader:
+        nomsospetti.append(row[0])
 
 queries = {
     'Query 1': [
         # Query per transazioni con importo maggiore di 1000
-        {'Importo': {'$gt': 1000}},
+        {'Importo': {'$lt': 1000}},
         # Transazioni da paesi extra-UE (Paese_a_Rischio è 'Sì')
         {'Paese_a_Rischio': 'Sì'},
         # Transazioni con metodo di pagamento diverso da 'Carta di credito'
