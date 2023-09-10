@@ -33,7 +33,7 @@ def insert_data_to_neo4j(dataset, session):
         t.Paese_a_Rischio = row.Paese_a_Rischio,
         t.Mittente_sospetto = row.Mittente_sospetto,
         t.Destinatario_sospetto = row.Destinatario_sospetto
-
+        
     // Crea i nodi Mittente e Destinatario
     MERGE (m:Mittente {nome: row.Mittente})
     MERGE (d:Destinatario {nome: row.Destinatario})

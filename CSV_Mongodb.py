@@ -4,17 +4,16 @@ import time
 import statistics
 import openpyxl
 import scipy.stats
-import queries  # Importa le query definite nel file queries.py
 
 # Connessione a MongoDB
 mongo_client = MongoClient('mongodb://localhost:27017/')
 mongo_db = mongo_client['Antiriciclaggio']
 
 # Definizione delle collezioni
-mongo_collection_25 = mongo_db['Db_25']
-mongo_collection_50 = mongo_db['Db_50']
-mongo_collection_75 = mongo_db['Db_75']
-mongo_collection_100 = mongo_db['Db_100']
+mongo_collection_25 = mongo_db['Transazioni_25']
+mongo_collection_50 = mongo_db['Transazioni_50']
+mongo_collection_75 = mongo_db['Transazioni_75']
+mongo_collection_100 = mongo_db['Transazioni_100']
 
 # Definizione dei dataset
 collections = {
@@ -23,12 +22,110 @@ collections = {
     '75%': mongo_collection_75,
     '100%': mongo_collection_100
 }
+# Query 1
+query_1 = [
+    {
+        'Importo': {'$lt': 1000},
+        'Paese_a_Rischio': 'Sì',
+        'Metodo_di_pagamento': {'$ne': 'Carta di credito'}
+    }
+]
+
+# Query 2
+query_2 = [
+    {
+        '$or': [
+            {'Importo': {'$gt': 2000}},
+            {
+                '$and': [
+                    {'Paese_a_Rischio': 'Sì'},
+                    {'Metodo_di_pagamento': 'Bonifico'},
+                    {'Data': {'$lt': '2023-06-30T00:00:00Z'}}
+                ]
+            }
+        ]
+    }
+]
+
+# Query 3
+query_3 = [
+    {
+        '$or': [
+            {
+                '$and': [
+                    {'Paese_a_Rischio': 'Sì'},
+                    {'Importo': {'$gt': 1500}}
+                ]
+            },
+            {
+                '$and': [
+                    {'Paese_a_Rischio': 'No'},
+                    {'Metodo_di_pagamento': {'$ne': 'PayPal'}}
+                ]
+            }
+        ],
+        'Data': {'$gte': '2023-01-01T00:00:00Z', '$lte': '2023-12-31T23:59:59Z'}
+    }
+]
+
+# Query 4
+query_4 = [
+    {
+        '$or': [
+            {
+                '$and': [
+                    {'Paese_a_Rischio': 'Sì'},
+                    {
+                        '$or': [
+                            {'Mittente_sospetto': 'Si'},
+                            {'Destinatario_sospetto': 'Si'}
+                        ]
+                    }
+                ]
+            },
+            {
+                '$and': [
+                    {'Importo': {'$gt': 1500}},
+                    {'Metodo_di_pagamento': 'Assegno'},
+                    {'Data': {'$gt': '2023-09-15T00:00:00Z'}}
+                ]
+            }
+        ]
+    },
+    {
+        '$unwind': '$Destinatario'
+    },
+    {
+        '$lookup': {
+            'from': 'Destinatario',
+            'localField': 'Destinatario',
+            'foreignField': 'Nome',
+            'as': 'DestinatarioData'
+        }
+    },
+    {
+        '$group': {
+            '_id': '$_id',
+            'Transazione': {'$first': '$$ROOT'},
+            'Destinatario': {'$first': {'$arrayElemAt': ['$DestinatarioData', 0]}}
+        }
+    }
+]
+
+# Lista delle query
+queries = {
+    'Query 1': query_1,
+    'Query 2': query_2,
+    'Query 3': query_3,
+    'Query 4': query_4
+}
 
 
 # Funzione per eseguire la query
 def execute_query(collection, query):
     def wrapper():
         result = list(collection.find(query))  # Converte il risultato in una lista
+        print(result)
         return result  # Restituisce il risultato della query
 
     return wrapper
@@ -37,13 +134,13 @@ def execute_query(collection, query):
 # Numero di esecuzioni per ogni query e dataset
 num_executions = 31
 
-# Apri il file CSV per i risultati
+# Apertura del file CSV per i risultati
 with open('Risultati_esperimenti_MongoDB.csv', 'w', newline='') as csvfile:
     csvwriter = csv.writer(csvfile)
     csvwriter.writerow(
         ['Query', 'Database', 'First Execution Time (ms)', 'Average Execution Time (ms)', 'Confidence Interval (95%)'])
     # Esecuzione degli esperimenti e registrazione dei risultati nel file CSV
-    for query_name, query_list in queries.queries.items():
+    for query_name, query_list in queries.items():
         for dataset_percentage, collection in collections.items():
             print(f"Query: {query_name}, Dataset: {dataset_percentage}")
             single_query_times = []
