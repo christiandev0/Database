@@ -9,6 +9,7 @@ queries = [
     """ 
     MATCH (t:Transazione)
     WHERE t.Importo < '1000'
+    AND t.Metodo_di_pagamento = 'Carta di credito'
     RETURN t
     """,
     """ 
@@ -61,10 +62,12 @@ for db_percentage in percentages:
                 # Esegui la query e ottieni il risultato
                 result = session.run(query).data()
                 execution_time = (time.perf_counter() - start_time) * 1000
-                execution_times_query.append(execution_time)
-                # Ignora la prima esecuzione della prima query al 25%
-                if query_idx == 0 and first_execution_time is None:
+
+                # Salva il tempo della prima esecuzione solo se è la prima esecuzione di questa query
+                if first_execution_time is None:
                     first_execution_time = execution_time
+
+                execution_times_query.append(execution_time)
 
             avg_execution_time = np.mean(execution_times_query)
             std_deviation = np.std(execution_times_query)
@@ -81,6 +84,7 @@ for db_percentage in percentages:
                 "Average Execution Time (ms)": avg_execution_time,
                 "Confidence Interval (95%)": confidence_interval,
             })
+    driver.close()
 
 # Scrittura dei risultati nel file CSV
 csv_file = 'Risultati_esperimenti_Neo4j.csv'
