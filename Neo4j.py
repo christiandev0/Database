@@ -19,7 +19,6 @@ with open('transactions.csv', 'r', newline='') as csv_file:
 
 
 # Funzione per inserire i dati da un dataset nel database Neo4j
-# Funzione per inserire i dati da un dataset nel database Neo4j
 def insert_data_to_neo4j(dataset, session):
     query = """
     // Crea i nodi Transazione
@@ -54,7 +53,7 @@ db50 = transactions_data[:int(len(transactions_data) * 0.50)]
 db75 = transactions_data[:int(len(transactions_data) * 0.75)]
 db100 = transactions_data
 
-# Inserisci i dati nei diversi database di Neo4j
+# Inserimento i dati nei diversi database di Neo4j
 with driver25.session() as session:
     insert_data_to_neo4j(db25, session)
     print("Inserimento nel dataset 25% completato")

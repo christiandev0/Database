@@ -12,10 +12,10 @@ mongo_client = MongoClient('mongodb://localhost:27017/')
 mongo_db = mongo_client['Antiriciclaggio']
 
 # Definizione delle collezioni
-mongo_collection_25 = mongo_db['Transazione_25']
-mongo_collection_50 = mongo_db['Transazione_50']
-mongo_collection_75 = mongo_db['Transazione_75']
-mongo_collection_100 = mongo_db['Transazione_100']
+mongo_collection_25 = mongo_db['Transazioni_25']
+mongo_collection_50 = mongo_db['Transazioni_50']
+mongo_collection_75 = mongo_db['Transazioni_75']
+mongo_collection_100 = mongo_db['Transazioni_100']
 
 # Definizione dei dataset
 collections = {
